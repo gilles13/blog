@@ -7,6 +7,11 @@ categories: ["R"]
 tags: ["init", "test"]
 ---
 
+
+
+
+
+
 ## Test de workflow
 
 Principe : render / pre-build site en local avec rmarkdown, commit push les fichiers générés, déploiement sur netlify *via* hugo.
@@ -16,5 +21,5 @@ Principe : render / pre-build site en local avec rmarkdown, commit push les fich
 plot(1:5)
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+<img src="./images/unnamed-chunk-1-1.png" width="672" />
 

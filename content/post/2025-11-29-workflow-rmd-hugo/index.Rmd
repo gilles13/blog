@@ -7,6 +7,22 @@ categories: ["R"]
 tags: ["init", "test"]
 ---
 
+```{r setup, include=FALSE}
+slug <- tools::file_path_sans_ext(basename(knitr::current_input()))
+img_dir <- file.path(dirname(knitr::current_input()), "images")
+dir.create(img_dir, recursive = TRUE, showWarnings = FALSE)
+knitr::opts_chunk$set(
+  fig.path = paste0(img_dir, "/"),
+  dev = "png",
+  dpi = 96,
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+
+
+
 ## Test de workflow
 
 Principe : render / pre-build site en local avec rmarkdown, commit push les fichiers générés, déploiement sur netlify *via* hugo.

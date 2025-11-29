@@ -2,48 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://gilles13.github.io/categories/</loc>
+    <loc>http://localhost:1313/categories/</loc>
     <lastmod>2025-11-29T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://gilles13.github.io/tags/init/</loc>
+    <loc>http://localhost:1313/tags/init/</loc>
     <lastmod>2025-11-29T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://gilles13.github.io/</loc>
+    <loc>http://localhost:1313/</loc>
     <lastmod>2025-11-29T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://gilles13.github.io/post/</loc>
+    <loc>http://localhost:1313/post/</loc>
     <lastmod>2025-11-29T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://gilles13.github.io/categories/r/</loc>
+    <loc>http://localhost:1313/categories/r/</loc>
     <lastmod>2025-11-29T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://gilles13.github.io/tags/</loc>
+    <loc>http://localhost:1313/tags/</loc>
     <lastmod>2025-11-29T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://gilles13.github.io/tags/test/</loc>
+    <loc>http://localhost:1313/tags/test/</loc>
     <lastmod>2025-11-29T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://gilles13.github.io/2025/11/29/workflow-rmd-hugo/</loc>
+    <loc>http://localhost:1313/2025/11/29/workflow-rmd-hugo/</loc>
     <lastmod>2025-11-29T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://gilles13.github.io/2020/12/01/hello-r-markdown/</loc>
+    <loc>http://localhost:1313/2020/12/01/hello-r-markdown/</loc>
     <lastmod>2020-12-01T21:13:14-05:00</lastmod>
   </url><url>
-    <loc>https://gilles13.github.io/tags/plot/</loc>
+    <loc>http://localhost:1313/tags/plot/</loc>
     <lastmod>2020-12-01T21:13:14-05:00</lastmod>
   </url><url>
-    <loc>https://gilles13.github.io/tags/r-markdown/</loc>
+    <loc>http://localhost:1313/tags/r-markdown/</loc>
     <lastmod>2020-12-01T21:13:14-05:00</lastmod>
   </url><url>
-    <loc>https://gilles13.github.io/tags/regression/</loc>
+    <loc>http://localhost:1313/tags/regression/</loc>
     <lastmod>2020-12-01T21:13:14-05:00</lastmod>
   </url><url>
-    <loc>https://gilles13.github.io/2016/12/30/a-plain-markdown-post/</loc>
-    <lastmod>2016-12-30T21:49:57-07:00</lastmod>
-  </url><url>
-    <loc>https://gilles13.github.io/2015/01/01/lorem-ipsum/</loc>
-    <lastmod>2015-01-01T13:09:13-06:00</lastmod>
-  </url><url>
-    <loc>https://gilles13.github.io/about/</loc>
+    <loc>http://localhost:1313/about/</loc>
   </url>
 </urlset>

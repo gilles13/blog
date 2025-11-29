@@ -7,7 +7,16 @@ tags: ["R Markdown", "plot", "regression"]
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(collapse = TRUE)
+slug <- tools::file_path_sans_ext(basename(knitr::current_input()))
+img_dir <- file.path(dirname(knitr::current_input()), "images")
+dir.create(img_dir, recursive = TRUE, showWarnings = FALSE)
+knitr::opts_chunk$set(
+  fig.path = paste0(img_dir, "/"),
+  dev = "png",
+  dpi = 96,
+  fig.width = 7,
+  fig.height = 4
+)
 ```
 
 # R Markdown
