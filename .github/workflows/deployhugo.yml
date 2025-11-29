@@ -1,0 +1,43 @@
+name: Deploy Hugo site to gh-pages
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Install Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.152.2'   # adapte à la version que tu utilises
+          extended: false            # true si ton thème utilise SCSS/Tailwind
+
+      - name: Build Hugo site
+        run: hugo --minify
+
+      - name: Show public/ content (debug)
+        run: |
+          echo "Listing generated files in public/:"
+          ls -la public | head -n 50
+          echo "Total files:"
+          find public -type f | wc -l
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages

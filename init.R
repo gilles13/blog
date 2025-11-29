@@ -4,6 +4,7 @@
 library("blogdown")
 
 list.files(path = ".")
+getwd()
 
 blogdown::install_hugo()
 

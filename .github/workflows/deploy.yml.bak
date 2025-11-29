@@ -21,7 +21,7 @@ jobs:
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
         with:
-          r-version: '4.3'    # adapte selon ta version R préférée
+          r-version: '4.3'
 
       - name: Install system dependencies
         run: |
