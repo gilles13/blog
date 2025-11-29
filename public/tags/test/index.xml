@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Test on Mon blog</title>
+    <link>https://gilles13.github.io/tags/test/</link>
+    <description>Recent content in Test on Mon blog</description>
+    <generator>Hugo</generator>
+    <language>fr-FR</language>
+    <lastBuildDate>Sat, 29 Nov 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://gilles13.github.io/tags/test/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Workflow Rmd&#43;Hugo</title>
+      <link>https://gilles13.github.io/2025/11/29/workflow-rmd-hugo/</link>
+      <pubDate>Sat, 29 Nov 2025 00:00:00 +0000</pubDate>
+      <guid>https://gilles13.github.io/2025/11/29/workflow-rmd-hugo/</guid>
+      <description>&lt;h2 id=&#34;test-de-workflow&#34;&gt;Test de workflow&lt;/h2&gt;&#xA;&lt;p&gt;Principe : render / pre-build site en local avec rmarkdown, commit push les fichiers générés, déploiement sur netlify &lt;em&gt;via&lt;/em&gt; hugo.&lt;/p&gt;&#xA;&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;plot(1:5)&#xA;&lt;/code&gt;&lt;/pre&gt;&#xA;&lt;img src=&#34;https://gilles13.github.io/2025/11/29/workflow-rmd-hugo/index_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;</description>
+    </item>
+  </channel>
+</rss>

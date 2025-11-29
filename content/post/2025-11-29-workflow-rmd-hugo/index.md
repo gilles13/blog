@@ -1,0 +1,20 @@
+---
+title: Workflow Rmd+Hugo
+author: ''
+date: '2025-11-29'
+slug: workflow-rmd-hugo
+categories: ["R"]
+tags: ["init", "test"]
+---
+
+## Test de workflow
+
+Principe : render / pre-build site en local avec rmarkdown, commit push les fichiers générés, déploiement sur netlify *via* hugo.
+
+
+``` r
+plot(1:5)
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+
