@@ -1,4 +1,6 @@
 baseurl: https://gilles13.github/blog/
+relativeURLs: true
+canonifyURLs: false
 languageCode: en-US
 title: Mon blog
 theme: hugo-lithium
