@@ -1,7 +1,5 @@
-baseurl: https://gilles13.github/blog/
-relativeURLs: true
-canonifyURLs: false
-languageCode: en-US
+baseurl: "https://gilles13.github.io/"
+languageCode: fr-FR
 title: Mon blog
 theme: hugo-lithium
 ignoreFiles:
@@ -15,9 +13,9 @@ menu:
     - name: About
       url: /about/
     - name: GitHub
-      url: https://github.com/rstudio/blogdown
+      url: https://github.com/gilles13
     - name: Twitter
-      url: https://twitter.com/rstudio
+      url: https://twitter.com/gilles13
 params:
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
@@ -30,9 +28,9 @@ params:
   highlightjsTheme: github
   highlightjsVersion: 9.12.0
   logo:
-    url: monlogo.jpg
     alt: Logo
     height: 50
+    url: monlogo.jpg
     width: 50
 markup:
   defaultMarkdownHandler: goldmark
