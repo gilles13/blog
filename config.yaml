@@ -15,7 +15,7 @@ menu:
     - name: GitHub
       url: https://github.com/gilles13
     - name: Twitter
-      url: https://twitter.com/gilles13
+      url: https://twitter.com/gillesfidani
 params:
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
