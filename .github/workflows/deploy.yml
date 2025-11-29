@@ -1,0 +1,58 @@
+name: Build and deploy site (blogdown → gh-pages)
+
+# Trigger: change to your branch if needed
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write   # nécessaire pour push vers gh-pages via GITHUB_TOKEN
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3'    # adapte selon ta version R préférée
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -y
+          # si tu as besoin d'autres paquets système, ajoute-les ici (ex: libxml2-dev)
+          # sudo apt-get install -y libxml2-dev libcurl4-openssl-dev libssl-dev
+
+      - name: Install R packages
+        run: |
+          Rscript -e 'install.packages(c("remotes","rmarkdown","blogdown"), repos="https://cloud.r-project.org")'
+          # si tu utilises renv, tu peux remplacer par: Rscript -e "if (file.exists('renv.lock')) renv::restore()"
+          Rscript -e 'if (!requireNamespace("blogdown", quietly=TRUE)) install.packages("blogdown")'
+
+      - name: Install Hugo (via blogdown)
+        run: |
+          Rscript -e 'blogdown::install_hugo()'  # installe la version recommandée
+
+      - name: Build site (render Rmd and build public/)
+        run: |
+          # Render site: render Rmd -> HTML, then build site into public/
+          Rscript -e 'rmarkdown::render_site(encoding = "UTF-8")' || true
+          # blogdown::build_site() s'assure que site est construit via Hugo
+          Rscript -e 'blogdown::build_site()'
+
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          publish_dir: ./public
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # optionally set user name/email:
+          # user_name: 'github-actions[bot]'
+          # user_email: 'github-actions[bot]@users.noreply.github.com'
+
