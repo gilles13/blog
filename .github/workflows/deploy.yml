@@ -4,7 +4,7 @@ name: Build and deploy site (blogdown → gh-pages)
 on:
   push:
     branches:
-      - main
+      - master
 
 permissions:
   contents: write   # nécessaire pour push vers gh-pages via GITHUB_TOKEN
