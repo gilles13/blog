@@ -1,0 +1,39 @@
+---
+title: Compteur linky
+author: "Gilles"
+date: 2025-11-29
+slug: compteur-linky
+categories: ["Energie"]
+tags: ["linky"]
+output: blogdown::html_page
+---
+
+```{r setup, include=FALSE}
+slug <- tools::file_path_sans_ext(basename(knitr::current_input()))
+img_dir <- file.path(dirname(knitr::current_input()), "images")
+dir.create(img_dir, recursive = TRUE, showWarnings = FALSE)
+knitr::opts_chunk$set(
+  fig.path = paste0(img_dir, "/"),
+  dev = "png",
+  dpi = 96,
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+## Introduction
+
+<img src="static/images/ameenfahmy-qzHw9jcatMs.jpg" alt="montexte" />
+
+## Documentation
+
+## Liens
+
+[Wikipédia](https://fr.wikipedia.org/wiki/Linky)
+
+[Enedis](https://www.enedis.fr/le-compteur-linky-vous-facilite-la-vie)
+
+## Ma consommation
+
+TODO
+

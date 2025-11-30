@@ -1,25 +1,38 @@
 ---
 title: Workflow Rmd+Hugo
-author: ''
-date: '2025-11-29'
+author: "Gilles"
+date: 2025-11-29
 slug: workflow-rmd-hugo
 categories: ["R"]
 tags: ["init", "test"]
+output: blogdown::html_page
 ---
 
+## Principe
 
+render / pre-build site en local avec rmarkdown, commit push les
+fichiers générés, déploiement sur netlify *via* hugo.
 
+## Avantage
 
+Déploiement rapide, ne nécessite pas d’installer R et ses packages
 
+## Inconvénient
 
-## Test de workflow
-
-Principe : render / pre-build site en local avec rmarkdown, commit push les fichiers générés, déploiement sur netlify *via* hugo.
-
+- Nécessite de render en local (avec le script `scripts/_build.R`)
+- Gérer le *pitfall* des figures générées dans les *bundles* Hugo :
+  - chaque post doit contenir un répertoire images
+  - chaque fichier index.Rmd doit contenir un paragraphe de paramétrage
 
 ``` r
-plot(1:5)
+slug <- tools::file_path_sans_ext(basename(knitr::current_input()))
+img_dir <- file.path(dirname(knitr::current_input()), "images")
+dir.create(img_dir, recursive = TRUE, showWarnings = FALSE)
+knitr::opts_chunk$set(
+  fig.path = paste0(img_dir, "/"),
+  dev = "png",
+  dpi = 96,
+  fig.width = 7,
+  fig.height = 4
+)
 ```
-
-<img src="./images/unnamed-chunk-1-1.png" width="672" />
-
