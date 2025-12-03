@@ -1,0 +1,243 @@
+---
+title: "Dépenses de l'état 2023"
+author: "Gilles"
+date: "2025-12-03"
+slug: "depenses-etat-2023"
+categories: ["éco"]
+tags: ["dépenses", "budget"]
+---
+
+```{r setup, include=FALSE}
+slug <- tools::file_path_sans_ext(basename(knitr::current_input()))
+img_dir <- file.path(dirname(knitr::current_input()), "images")
+dir.create(img_dir, recursive = TRUE, showWarnings = FALSE)
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	echo = FALSE,
+  fig.path = paste0(img_dir, "/"),
+  fig.align = "center",
+  fig.width = 10,
+  fig.height = 8,
+  dev = "png",
+  dpi = 96
+)
+```
+
+```{r}
+library("dplyr")
+library("data.table")
+library("ggplot2")
+library("treemapify")
+
+group_num <- function(x) {
+    ret = 0
+    for (i in 1:length(x)) {
+        ret = bitwShiftL(ret, 1)
+        if (x[i]) {
+            ret = bitwOr(ret, 1L)
+        }
+    }
+    2^length(x) - ret - 1
+}
+```
+
+## Téléchargement des données
+
+Méthode *old school*, par une url.
+
+Bientôt, nous utiliserons [Melodi](https://www.insee.fr/fr/information/1302169?thematic=catalogue-de-donnees-de-l-insee-melodi){target="_blank"}
+
+```{r, echo = TRUE}
+urldata = "https://www.insee.fr/fr/statistiques/fichier/8068626/t_3303.xlsx"
+# download.file(url = urldata,
+#               mode = "wb",
+#               destfile = "~/data/insee/t_3303.xlsx")
+```
+
+```{r}
+# dépenses de l'état (S13111)
+t33 = readxl::read_xlsx("~/data/insee/t_3303.xlsx",
+                        skip = 3, sheet = "T_3303")
+names(t33) = c("sto", "oc", "expe", "explab", paste0("m", 2009:2023))
+
+t33 = 
+	t33 |> 
+	filter(sto != "STO")
+
+dico = list(
+n1 = data.frame(
+	t33 |> 
+	filter(nchar(expe) == 4) |> 
+	distinct(expe, explab) |> 
+	rename(code = expe, lab = explab)
+),
+n2 = 
+	t33 |> 
+	filter(nchar(expe) == 6) |> 
+	distinct(expe, explab) |> 
+	rename(code = expe, lab = explab)
+)
+
+# dico
+
+dico$n1 =
+	dico$n1 |> 
+	mutate(labshort = c("Svces gx des admin pub",
+											"Defense",
+											"Ordre SP",
+											"Affaires eco",
+											"Prot. envir.",
+											"Lgts & equip. coll",
+											"Sante",
+											"Culture",
+											"Enseignement",
+											"Prot. sociale"))
+```
+
+
+```{r}
+## Création du cube
+dt = 
+	t33 |> 
+	filter(nchar(expe) == 6) |> 
+	tidyr::pivot_longer(cols = -c(1:4)) |> 
+	tidyr::separate(col = expe,
+									sep = 4,
+									into = c("n1", "n2"),
+									remove = FALSE) |>
+	as.data.table()
+
+dims = c("sto", "expe", "n1", "n2", "name")
+
+cube =
+	data.table::cube(dt,
+									 j = lapply(.SD, sum, na.rm = TRUE),
+									 by = dims,
+									 id = TRUE,
+									 .SDcols = "value")
+
+gn = group_num(c(sto=T, expe=F, n1=F, n2=F, name=T))
+
+dep2023ote = 
+	cube |> 
+	filter(grouping == gn,
+				 name == "m2023",
+				 sto == "OTE") |> 
+	select(value) |> 
+	pull()
+
+f1 = group_num(c(sto=T, expe=F, n1=T, n2=F, name=T))
+d1 =
+	cube |> 
+	filter(grouping == f1,
+				 name == "m2023",
+				 sto == "OTE") |> 
+	left_join(y = dico$n1, by = c("n1" = "code"))
+d1[, part := value/sum(value) * 100]
+
+
+f2 = group_num(c(sto=T, expe=T, n1=T, n2=T, name=T))
+d2 =
+	cube |> 
+	filter(grouping == f2,
+				 name == "m2023",
+				 sto == "OTE") |> 
+	left_join(y = dico$n2, by = c("expe" = "code")) |> 
+	rename(labn2 = lab)
+
+d2 = 
+	d2 |> 
+	left_join(y = dico$n1, by = c("n1" = "code")) |> 
+	rename(labn1 = lab, labsn1 = labshort)
+
+d2[, part := value/sum(value) * 100]
+
+# d2 |> 
+# 	arrange(desc(part)) |> 
+# 	tibble::as_tibble() |> 
+# 	mutate(value = round(value, 1),
+# 				 part = round(part , 1)) |> 
+# 	DT::datatable(filter = "top")
+
+d2 =
+	d2 |> 
+	mutate(labn2 = substr(labn2, start = 7, stop = nchar(labn2))) |> 
+	mutate(labn1p = paste0(labsn1, "\n", value, " Mds €"))
+```
+
+## Catégories de dépenses
+
+```{r}
+dico$n1 |> 
+  select(-labshort) |> 
+  knitr::kable() |> 
+  kableExtra::kable_styling()
+```
+
+## Part de dépenses par catégorie
+
+```{r}
+d1 |> 
+	arrange(desc(part)) |> 
+	tibble::as_tibble() |> 
+	mutate(value = round(value, 1),
+				 part = round(part , 1)) |> 
+  select(lab, value, part) |> 
+  janitor::adorn_totals() |> 
+  knitr::kable(format = "html", booktabs = TRUE)
+#   kableExtra::kable(format = "html", booktabs = TRUE)
+```
+
+## Plot
+```{r}
+# treemapify
+# ```{r, out.width="100%", out.height="100%"}
+p = 
+	ggplot(d2, aes(
+  area = value,
+  fill = labsn1,
+  label = labn2,
+  subgroup = labsn1)) +
+  geom_treemap(size = 2) +
+  geom_treemap_subgroup_border(colour = "blue", size = 3) +
+	# LABELS NIV 2
+	geom_treemap_text(
+    place = "centre",
+    grow = FALSE,
+    colour = "white",
+    reflow = TRUE) +
+	# LABELS N1
+  geom_treemap_subgroup_text(
+    place = "centre",
+    grow = T,
+    alpha = 0.3,
+    colour = "black",
+    fontface = "bold",
+    min.size = 1
+  ) +
+  labs(
+    title = paste0("Dépenses de l'état 2023 = ", round(dep2023ote, 0), " Mds €"),
+		subtitle = "https://www.insee.fr/fr/statistiques/8068624?sommaire=8068749",
+    caption = 
+			paste0("Source : Insee, comptes nationaux, base 2020",
+						 "\n",
+						 urldata)) +
+  theme(legend.position = "none", 
+				panel.border = element_rect(colour = "blue", fill = NA, linewidth = 3),
+				plot.title = element_text(size = 28),
+				plot.caption = element_text(hjust = 0, size = 14))
+p
+
+# ggsave(filename = "~/dep23.png", 
+# 			 width = 16,
+# 			 height = 16,
+# 			 plot = p)
+
+```
+
+## Liens
+
+[Données Insee]("https://www.insee.fr/fr/statistiques/8068624?sommaire=8068749"){target="_blank"}
+
+[Rapport CC juin 2025](https://ccomptes.fr/fr/publications/la-situation-et-les-perspectives-des-finances-publiques-16){target="_blank"}

@@ -1,0 +1,137 @@
+---
+title: "Des maths avec R"
+author: "Gilles"
+date: 2025-12-03
+slug: "math-en-r"
+categories: ["R"]
+tags: ["math", "geom"]
+---
+
+```{r setup, include=FALSE}
+slug <- tools::file_path_sans_ext(basename(knitr::current_input()))
+img_dir <- file.path(dirname(knitr::current_input()), "images")
+dir.create(img_dir, recursive = TRUE, showWarnings = FALSE)
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	echo = FALSE,
+  fig.path = paste0(img_dir, "/"),
+  fig.align = "center",
+  fig.width = 9,
+  fig.height = 6,
+  dev = "png",
+  dpi = 96
+)
+```
+
+## Théorème de Pythagore
+
+Dans un triangle rectangle, l'hypoténuse est le côté opposé à l'angle droit.
+
+L'hypoténuse est le plus grand côté du triangle rectangle.
+
+Si un triangle est rectangle, alors le carré de la longueur de l'hypoténuse est égal à la somme des carrés des longueurs des deux autres côtés.
+
+Avec les notations du triangle ABC rectangle en A, on a 
+
+$$ BC^2 = AB^2 + AC^2 $$
+
+```{r}
+library(ggplot2)
+
+# --- 1) Définir les points du triangle rectangle ---
+A <- c(x = 0, y = 0)
+B <- c(x = 3, y = 0)
+C <- c(x = 0, y = 4)
+
+# Data frame pour le polygone (fermé en répétant A)
+tri_df <- data.frame(
+  x = c(A["x"], B["x"], C["x"], A["x"]),
+  y = c(A["y"], B["y"], C["y"], A["y"])
+)
+
+# Segments (pour annotation et affichage distinct des côtés)
+segs_df <- data.frame(
+  x    = c(A["x"], A["x"], B["x"]),
+  xend = c(B["x"], C["x"], C["x"]),
+  y    = c(A["y"], A["y"], B["y"]),
+  yend = c(B["y"], C["y"], C["y"]),
+  name = c("AB","AC","BC")
+)
+
+# Points pour afficher les sommets
+pts_df <- data.frame(
+  name = c("A","B","C"),
+  x = c(A["x"], B["x"], C["x"]),
+  y = c(A["y"], B["y"], C["y"])
+)
+
+# --- 2) Calcul des longueurs ---
+dist <- function(p1, p2) sqrt((p1["x"]-p2["x"])^2 + (p1["y"]-p2["y"])^2)
+AB <- dist(A,B)   # = 3
+AC <- dist(A,C)   # = 4
+BC <- dist(B,C)   # = 5
+
+# Hypoténuse via Pythagore (vérif)
+hyp_py <- sqrt(AB^2 + AC^2)
+
+# --- 3) Positions pour les labels (milieux des segments) ---
+midpoint <- function(x1,y1,x2,y2) c(x = (x1+x2)/2, y = (y1+y2)/2)
+mid_AB <- midpoint(A["x"], A["y"], B["x"], B["y"])
+mid_AC <- midpoint(A["x"], A["y"], C["x"], C["y"])
+mid_BC <- midpoint(B["x"], B["y"], C["x"], C["y"])
+
+# --- 4) Tracé avec ggplot2 ---
+p <- ggplot() +
+  # polygone du triangle
+  geom_polygon(data = tri_df, aes(x = x, y = y),
+               fill = "lightblue", alpha = 0.4, color = "blue") +
+  # côtés
+  geom_segment(data = segs_df, aes(x = x, y = y, xend = xend, yend = yend),
+               linewidth = 1.2) +
+  # sommets
+  geom_point(data = pts_df, aes(x = x, y = y), size = 3) +
+  geom_text(data = pts_df, aes(x = x, y = y, label = name),
+            nudge_x = 0.15, nudge_y = 0.15, size = 4) +
+  # labels de longueur
+  annotate("text", x = mid_AB["x"], y = mid_AB["y"] - 0.25,
+           label = paste0("AB = ", AB, " unités"), size = 4) +
+  annotate("text", x = mid_AC["x"] - 0.3, y = mid_AC["y"],
+           label = paste0("AC = ", AC, " unités"), size = 4) +
+  annotate("text", x = mid_BC["x"] + 0.5, y = mid_BC["y"] + 0.2,
+           label = paste0("BC = ", BC, " unités"), size = 4) +
+  # marque de l'angle droit (petit carré)
+  geom_segment(aes(x = 0.25, y = 0, xend = 0.25, yend = 0.25), size = 0.8) +
+  geom_segment(aes(x = 0, y = 0.25, xend = 0.25, yend = 0.25), size = 0.8) +
+  # formule de l'hypoténuse (affichée avec parse=TRUE pour rendu mathématique)
+  annotate("text", x = 1.5, y = 2.2,
+           hjust = 0,
+           label = paste0("c == sqrt(a^2 + b^2) ~\",\"~ c == ", hyp_py),
+           parse = TRUE, size = 5) +
+  coord_equal(expand = TRUE) +
+  labs(title = "Triangle rectangle",
+       x = "", y = "",
+       subtitle = paste0("AB = ", AB, " ; AC = ", AC, " ; BC = ", BC)) +
+  theme_minimal(base_size = 14)
+
+print(p)
+
+```
+
+## Fonction
+
+```{r, echo = TRUE}
+
+hypo_fun <- function(a=3, b=4) {
+  sqrt(a^2 + b^2)
+}
+
+hypo_fun()
+
+hypo_fun(a = 8, b = 14)
+
+hypo_fun(a = 70, b = 30)
+
+
+```
+

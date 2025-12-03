@@ -1,78 +1,56 @@
 #!/usr/bin/env Rscript
-# scripts/_build.R
 
-# ---- remove old generated markdown to avoid conflicts ----
-md_files <- list.files("content/post", pattern = "^index\\.md$", recursive = TRUE, full.names = TRUE)
-if (length(md_files) > 0) {
-  message("Removing ", length(md_files), " old generated index.md files...")
-  file.remove(md_files)
-} else {
-  message("No previously generated index.md files found.")
-}
-
-# ---- render Rmd -> md ----
-rmd_files <- list.files("content/post", pattern = "^index\\.Rmd$", recursive = TRUE, full.names = TRUE)
-if (length(rmd_files) == 0) {
-  message("No index.Rmd files found under content/post. Nothing to render.")
-} else {
-  message("Found ", length(rmd_files), " index.Rmd files. Rendering to Markdown...")
-  for (rmd in rmd_files) {
-    message(" -> rendering: ", rmd)
-    tryCatch({
-      rmarkdown::render(input = rmd,
-                        output_format = rmarkdown::md_document(
-                          variant = "gfm",
-                          preserve_yaml = TRUE),
-                        encoding = "UTF-8",
-                        quiet = FALSE)
-    }, error = function(e) {
-      message("ERROR rendering ", rmd, ": ", conditionMessage(e))
-      stop("Aborting due to render error.")
-    })
+# ───────────────────────────────
+# Se placer automatiquement à la racine du projet Hugo
+# ───────────────────────────────
+find_project_root <- function() {
+  path <- normalizePath(getwd())
+  for (i in 1:6) {
+    if (file.exists(file.path(path, "config.yaml")) ||
+        file.exists(file.path(path, "config.toml"))) {
+      return(path)
+    }
+    path <- dirname(path)
   }
+  stop("Impossible de localiser la racine Hugo (config.yaml/toml introuvable)")
 }
 
-# ---- run hugo -D to build public/ ----
-message("Running Hugo (hugo -D)...")
-hugo_out <- tryCatch({
-  system2("hugo", args = c("-D"), stdout = TRUE, stderr = TRUE)
-}, error = function(e) {
-  stop("Failed to execute Hugo: ", conditionMessage(e))
-})
-cat(hugo_out, sep = "\n")
+project_root <- find_project_root()
+setwd(project_root)
+message("Project root: ", project_root)
 
-# check exit status by looking at Hugo output: system2 returned text, but we need status
-# We can run a command that gives exit status:
-hugo_status <- system2("hugo", args = c("-D"), stdout = NULL, stderr = NULL, wait = TRUE)
-if (hugo_status != 0) {
-  stop("Hugo exited with status ", hugo_status, ". See logs above. Ensure Hugo is configured and front matter dates are valid.")
-}
+# ───────────────────────────────
+# Construire tous les Rmd → md (front matter YAML correct)
+# ───────────────────────────────
+library(blogdown)
+message("Rendering all Rmd files via blogdown::build_site()...")
+blogdown::build_site()
 
-message("Hugo completed successfully. public/ should be up to date.")
+# ───────────────────────────────
+# Générer public/ avec Hugo
+# ───────────────────────────────
+message("Building site with Hugo...")
+hugo_output <- system2("hugo", args = c("-D"), stdout = TRUE, stderr = TRUE)
+cat(hugo_output, sep = "\n")
 
-# ---- optional: quick sanity checks of generated public/ structure ----
-# check a few generated paths
-sample_htmls <- list.files("public", pattern = "\\.html$", recursive = TRUE, full.names = TRUE)
-if (length(sample_htmls) == 0) {
-  warning("No HTML files found under public/. Something went wrong with Hugo build.")
+# ───────────────────────────────
+# Déploiement Netlify (optionnel)
+# ───────────────────────────────
+if (Sys.getenv("NETLIFY_AUTH_TOKEN") != "" && Sys.getenv("NETLIFY_SITE_ID") != "") {
+  message("Deploying to Netlify...")
+  cli <- system2(
+    "netlify",
+    args = c(
+      "deploy",
+      "--prod",
+      "--dir=public",
+      paste0("--auth=", Sys.getenv("NETLIFY_AUTH_TOKEN")),
+      paste0("--site=", Sys.getenv("NETLIFY_SITE_ID"))
+    ),
+    stdout = TRUE, stderr = TRUE
+  )
+  cat(cli, sep = "\n")
 } else {
-  message("public/ contains ", length(sample_htmls), " HTML files (sample: ", head(basename(sample_htmls), 5), ").")
+  message("NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID is missing → skipping deploy.")
 }
-
-# # ---- optional: Netlify deploy if env vars available ----
-# site_id <- Sys.getenv("NETLIFY_SITE_ID")
-# auth_token <- Sys.getenv("NETLIFY_AUTH_TOKEN")
-# if (nzchar(site_id) && nzchar(auth_token) && nzchar(netlify_path)) {
-#   message("Deploying public/ to Netlify (site=", site_id, ")...")
-#   netlify_res <- system2("netlify", args = c("deploy", "--prod",
-#                                              paste0("--dir=", normalizePath("public")),
-#                                              paste0("--site=", site_id),
-#                                              paste0("--auth=", auth_token)),
-#                          stdout = TRUE, stderr = TRUE)
-#   cat(netlify_res, sep = "\n")
-#   message("Netlify deploy finished.")
-# } else {
-#   message("NETLIFY_SITE_ID/AUTH_TOKEN not set or netlify CLI missing — skipping deploy.")
-# }
-
-message("Done.")
+message("✔ Build complete.")

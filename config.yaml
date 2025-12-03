@@ -1,4 +1,4 @@
-baseurl: "https://gilles13.github.io/"
+baseURL: "https://gilles13-blog.netlify.app/"
 languageCode: fr-FR
 title: Mon blog
 theme: hugo-lithium

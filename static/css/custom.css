@@ -1,0 +1,77 @@
+/* --- TABLE DEFAULTS ------------------------------------------------------ */
+
+.post-content table,
+article table,
+section table,
+.content table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 100%;
+  margin: 1em 0;
+  font-size: 0.95rem;
+  overflow-x: auto;
+  display: block; /* ensure responsive scrolling */
+}
+
+/* Apply nice borders and padding */
+.post-content table th,
+.post-content table td,
+article table th,
+article table td,
+section table th,
+section table td,
+.content table th,
+.content table td {
+  border: 1px solid var(--table-border-color, #ccc);
+  padding: 0.4em 0.6em;
+}
+
+/* Header styling */
+.post-content table th,
+article table th,
+section table th,
+.content table th {
+  background: var(--table-header-bg, #f2f2f2);
+  font-weight: 600;
+}
+
+/* Row striping */
+.post-content table tr:nth-child(even),
+article table tr:nth-child(even),
+section table tr:nth-child(even),
+.content table tr:nth-child(even) {
+  background: var(--table-even-bg, #fafafa);
+}
+
+/* Add a little rounding */
+.post-content table,
+article table,
+section table,
+.content table {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* --- DARK MODE SUPPORT --------------------------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --table-border-color: #555;
+    --table-header-bg: #333;
+    --table-even-bg: #2a2a2a;
+  }
+
+  .post-content table th,
+  article table th,
+  section table th,
+  .content table th {
+    color: #eee;
+  }
+
+  .post-content table td,
+  article table td,
+  section table td,
+  .content table td {
+    color: #ddd;
+  }
+}

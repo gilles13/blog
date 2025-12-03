@@ -1,0 +1,33 @@
+---
+title: "Des maths avec R"
+author: "Gilles"
+date: 2025-12-03
+slug: "math-en-r"
+categories: ["R"]
+tags: ["math", "geom"]
+---
+
+
+
+<div id="théorème-de-pythagore" class="section level2">
+<h2>Théorème de Pythagore</h2>
+<p>Dans un triangle rectangle, l’hypoténuse est le côté opposé à l’angle droit.</p>
+<p>L’hypoténuse est le plus grand côté du triangle rectangle.</p>
+<p>Si un triangle est rectangle, alors le carré de la longueur de l’hypoténuse est égal à la somme des carrés des longueurs des deux autres côtés.</p>
+<p>Avec les notations du triangle ABC rectangle en A, on a</p>
+<p><span class="math display">\[ BC^2 = AB^2 + AC^2 \]</span></p>
+<p><img src="images/unnamed-chunk-1-1.png" width="864" style="display: block; margin: auto;" /></p>
+</div>
+<div id="fonction" class="section level2">
+<h2>Fonction</h2>
+<pre class="r"><code>hypo_fun &lt;- function(a=3, b=4) {
+  sqrt(a^2 + b^2)
+}
+
+hypo_fun()</code></pre>
+<pre><code>## [1] 5</code></pre>
+<pre class="r"><code>hypo_fun(a = 8, b = 14)</code></pre>
+<pre><code>## [1] 16.12452</code></pre>
+<pre class="r"><code>hypo_fun(a = 70, b = 30)</code></pre>
+<pre><code>## [1] 76.15773</code></pre>
+</div>

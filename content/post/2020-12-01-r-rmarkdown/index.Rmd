@@ -5,7 +5,6 @@ date: 2020-12-01
 slug: hello-r-markdown
 categories: ["R"]
 tags: ["R Markdown", "plot", "regression"]
-output: blogdown::html_page
 ---
 
 ```{r setup, include=FALSE}
@@ -13,13 +12,53 @@ slug <- tools::file_path_sans_ext(basename(knitr::current_input()))
 img_dir <- file.path(dirname(knitr::current_input()), "images")
 dir.create(img_dir, recursive = TRUE, showWarnings = FALSE)
 knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	echo = FALSE,
   fig.path = paste0(img_dir, "/"),
-  dev = "png",
-  dpi = 96,
+  fig.align = "center",
   fig.width = 7,
-  fig.height = 4
+  fig.height = 4,
+  dev = "png",
+  dpi = 96
 )
 ```
+
+<p align="center">
+![](/images/ameenfahmy-qzHw9jcatMs-unsplash.jpg){width=50%}
+</p>
+
+## Tests
+
+### Divers
+
+Ici du texte de <span style="color: red;">couleur rouge</span>
+
+Ici du texte de <span style="background-color: yellow;">couleur jaune</span>
+
+Ici du texte de <mark>couleur jaune</mark>
+
+### Formules
+
+Les formules en ligne, $f(x)=x^2+3x+4, x\in\mathbb{R}$, permettent
+d'insérer des formules dans un paragraphe, tandis que les formules en mode
+_display_ permettent d'insérer des formules dans un bloc à part $$X\sim\mathcal{N}(0,1).$$
+
+### Notes de bas de page
+
+Une note de bas de page simple[^1]
+
+[^1]: une note de bas de page avec l'exécution d'une commande R : `r Sys.Date()`
+
+## Introduction
+
+```{r, eval=TRUE, echo=FALSE}
+library("lorem")
+htmltools::div(
+  lorem::ipsum(paragraphs = 30)
+)
+```
+
 
 # R Markdown
 

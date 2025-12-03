@@ -21,10 +21,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Introduction
-
-<img src="static/images/ameenfahmy-qzHw9jcatMs.jpg" alt="montexte" />
-
 ## Documentation
 
 ## Liens

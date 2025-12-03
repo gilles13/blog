@@ -8,13 +8,11 @@ redirects = []
 
 [build]
 publish = "/home/gilles/repogit/blog/public"
-publishOrigin = "config"
-commandOrigin = "config"
+publishOrigin = "ui"
+commandOrigin = "ui"
 command = "hugo"
 
 [build.environment]
-HUGO_VERSION = "0.152.2"
-HUGO_ENV = "production"
 
 [build.processing]
 

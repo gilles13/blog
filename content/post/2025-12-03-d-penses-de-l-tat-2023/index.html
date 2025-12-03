@@ -1,0 +1,269 @@
+---
+title: "Dépenses de l'état 2023"
+author: "Gilles"
+date: "2025-12-03"
+slug: "depenses-etat-2023"
+categories: ["éco"]
+tags: ["dépenses", "budget"]
+---
+
+<script src="{{< blogdown/postref >}}index_files/kePrint/kePrint.js"></script>
+<link href="{{< blogdown/postref >}}index_files/lightable/lightable.css" rel="stylesheet" />
+
+
+<div id="téléchargement-des-données" class="section level2">
+<h2>Téléchargement des données</h2>
+<p>Méthode <em>old school</em>, par une url.</p>
+<p>Bientôt, nous utiliserons <a href="https://www.insee.fr/fr/information/1302169?thematic=catalogue-de-donnees-de-l-insee-melodi" target="_blank">Melodi</a></p>
+<pre class="r"><code>urldata = &quot;https://www.insee.fr/fr/statistiques/fichier/8068626/t_3303.xlsx&quot;
+# download.file(url = urldata,
+#               mode = &quot;wb&quot;,
+#               destfile = &quot;~/data/insee/t_3303.xlsx&quot;)</code></pre>
+</div>
+<div id="catégories-de-dépenses" class="section level2">
+<h2>Catégories de dépenses</h2>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+code
+</th>
+<th style="text-align:left;">
+lab
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+GF01
+</td>
+<td style="text-align:left;">
+01 - Services généraux des administrations publiques
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GF02
+</td>
+<td style="text-align:left;">
+02 - Défense
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GF03
+</td>
+<td style="text-align:left;">
+03 - Ordre et sécurité publics
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GF04
+</td>
+<td style="text-align:left;">
+04 - Affaires économiques
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GF05
+</td>
+<td style="text-align:left;">
+05 - Protection de l’environnement
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GF06
+</td>
+<td style="text-align:left;">
+06 - Logements et équipements collectifs
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GF07
+</td>
+<td style="text-align:left;">
+07 - Santé
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GF08
+</td>
+<td style="text-align:left;">
+08 - Loisirs, culture et culte
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GF09
+</td>
+<td style="text-align:left;">
+09 - Enseignement
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GF10
+</td>
+<td style="text-align:left;">
+10 - Protection sociale
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="part-de-dépenses-par-catégorie" class="section level2">
+<h2>Part de dépenses par catégorie</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+lab
+</th>
+<th style="text-align:right;">
+value
+</th>
+<th style="text-align:right;">
+part
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+01 - Services généraux des administrations publiques
+</td>
+<td style="text-align:right;">
+148.4
+</td>
+<td style="text-align:right;">
+24.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+10 - Protection sociale
+</td>
+<td style="text-align:right;">
+136.9
+</td>
+<td style="text-align:right;">
+22.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+09 - Enseignement
+</td>
+<td style="text-align:right;">
+96.8
+</td>
+<td style="text-align:right;">
+16.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+04 - Affaires économiques
+</td>
+<td style="text-align:right;">
+95.2
+</td>
+<td style="text-align:right;">
+15.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+02 - Défense
+</td>
+<td style="text-align:right;">
+54.3
+</td>
+<td style="text-align:right;">
+9.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+03 - Ordre et sécurité publics
+</td>
+<td style="text-align:right;">
+38.8
+</td>
+<td style="text-align:right;">
+6.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+08 - Loisirs, culture et culte
+</td>
+<td style="text-align:right;">
+11.0
+</td>
+<td style="text-align:right;">
+1.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+05 - Protection de l’environnement
+</td>
+<td style="text-align:right;">
+7.1
+</td>
+<td style="text-align:right;">
+1.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+07 - Santé
+</td>
+<td style="text-align:right;">
+5.1
+</td>
+<td style="text-align:right;">
+0.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+06 - Logements et équipements collectifs
+</td>
+<td style="text-align:right;">
+3.6
+</td>
+<td style="text-align:right;">
+0.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:right;">
+597.2
+</td>
+<td style="text-align:right;">
+100.0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="plot" class="section level2">
+<h2>Plot</h2>
+<p><img src="images/unnamed-chunk-7-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+<div id="liens" class="section level2">
+<h2>Liens</h2>
+<p><a href="%22https://www.insee.fr/fr/statistiques/8068624?sommaire=8068749%22" target="_blank">Données Insee</a></p>
+<p><a href="https://ccomptes.fr/fr/publications/la-situation-et-les-perspectives-des-finances-publiques-16" target="_blank">Rapport CC juin 2025</a></p>
+</div>
