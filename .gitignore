@@ -1,3 +1,4 @@
 public/
 .Renviron
 .hugo_build.lock
+content/post/**/*.html
