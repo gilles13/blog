@@ -36,6 +36,11 @@ Avec les notations du triangle ABC rectangle en A, on a
 
 $$ BC^2 = AB^2 + AC^2 $$
 
+ou
+
+$$ BC = \sqrt{AB^2 + AC^2} $$
+
+
 ```{r}
 library(ggplot2)
 
@@ -106,7 +111,8 @@ p <- ggplot() +
   # formule de l'hypoténuse (affichée avec parse=TRUE pour rendu mathématique)
   annotate("text", x = 1.5, y = 2.2,
            hjust = 0,
-           label = paste0("c == sqrt(a^2 + b^2) ~\",\"~ c == ", hyp_py),
+#            label = paste0("c == sqrt(a^2 + b^2) ~\",\"~ c == ", hyp_py),
+           label = "BC == sqrt(AB^2 + AC^2)",
            parse = TRUE, size = 5) +
   coord_equal(expand = TRUE) +
   labs(title = "Triangle rectangle",
