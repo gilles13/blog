@@ -138,6 +138,5 @@ hypo_fun(a = 8, b = 14)
 
 hypo_fun(a = 70, b = 30)
 
-
 ```
 

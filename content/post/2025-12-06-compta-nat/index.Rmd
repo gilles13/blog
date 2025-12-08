@@ -1,0 +1,380 @@
+---
+title: "La comptabilité nationale"
+author: "Gilles"
+date: "2025-12-06"
+slug: compta-nat
+categories: ["eco"]
+tags: ["stat", "compta"]
+---
+
+```{r setup, include=FALSE}
+slug <- tools::file_path_sans_ext(basename(knitr::current_input()))
+img_dir <- file.path(dirname(knitr::current_input()), "images")
+dir.create(img_dir, recursive = TRUE, showWarnings = FALSE)
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	echo = FALSE,
+  fig.path = paste0(img_dir, "/"),
+  fig.align = "center",
+  fig.width = 9,
+  fig.height = 6,
+  dev = "png",
+  dpi = 96
+)
+```
+
+```{r}
+library("dplyr")
+library("ggplot2")
+library("data.table")
+
+tee = readRDS(file = "~/data/insee/tee20251206.RDS")
+apu = readRDS(file = "~/data/insee/apu20251207.RDS")
+
+mcodif = 
+  list.files(
+      path = "~/data/insee/indic_tee",
+      full.names = TRUE)
+mcodifn = 
+      list.files(
+        path = "~/data/insee/indic_tee",
+        full.names = FALSE) |> 
+  tools::file_path_sans_ext() |> 
+  tolower()
+dico = vector(mode = "list")
+idx = 1L
+for(i in mcodif) {
+  filename = tolower(tools::file_path_sans_ext(basename(i)))
+  tempfile = read.csv2(file = i) |> 
+    janitor::clean_names()
+  colnames(tempfile) = c("code", "libfr", "libeng")
+  tempfile =
+    tempfile |> 
+    dplyr::mutate(code = as.character(code),
+                  libfr = as.character(libfr),
+                  libeng = as.character(libeng))
+  dico[[idx]] = tempfile
+  idx = idx + 1
+}
+names(dico) = mcodifn
+
+mcodif2 = 
+  list.files(
+      path = "~/data/insee/indic_apu",
+      full.names = TRUE)
+mcodifn2 = 
+      list.files(
+        path = "~/data/insee/indic_apu",
+        full.names = FALSE) |> 
+  tools::file_path_sans_ext() |> 
+  tolower()
+dico = vector(mode = "list")
+idx = 1L
+for(i in mcodif2) {
+  filename = tolower(tools::file_path_sans_ext(basename(i)))
+  tempfile = read.csv2(file = i) |> 
+    janitor::clean_names()
+  colnames(tempfile) = c("code", "libfr", "libeng")
+  tempfile =
+    tempfile |> 
+    dplyr::mutate(code = as.character(code),
+                  libfr = as.character(libfr),
+                  libeng = as.character(libeng))
+  dico[[idx]] = tempfile
+  idx = idx + 1
+}
+names(dico) = mcodifn2
+
+# df = purrr::imap_dfr(dico, ~ mutate(.x, ref = .y)) |> 
+#   dplyr::relocate(ref)
+# df |> DT::datatable(rownames = TRUE, filter = "top")
+
+# alldic = do.call(rbind, lapply(dico, as.data.frame))
+# alldic |> DT::datatable(rownames = TRUE, filter = "top")
+```
+
+## Propos liminaires
+
+La comptabilité nationale est, à mon sens, un sujet assez austère, technique, et difficilement accessible.
+
+Ce billet de blog ne prétend pas rendre le sujet intéressant. Il donne simplement quelques pistes et liens pour analyser les données dont nous disposons.
+
+Commençons par le principal...
+
+## Définitions
+
+De quoi parle-t-on quand on dit "les comptes de la nation", ou "les comptes de l'Etat" ?
+
+C'est quoi l'État ?
+
+La [direction du Budget (DB)](https://www.budget.gouv.fr/panorama-finances-publiques) nous indique que :
+
+> On distingue habituellement quatre sous-secteurs au sein de l’ensemble
+« administrations publiques » ([**APU**](https://www.insee.fr/fr/metadonnees/definition/c1244)) :
+
+1. l’État
+
+2. les organismes divers d’administration centrale (**ODAC**)
+
+*ces deux sous-secteurs réunis composent l’ensemble des administrations publiques centrales.*
+
+3. les administrations publiques locales (**APUL**) qui incluent l’ensemble des collectivités territoriales mais aussi les organismes divers d’administration locale
+
+4. les administrations de sécurité sociale (**ASSO**) qui regroupent les **ODASS** et l’ensemble des régimes d’assurance sociale : régime général et régimes spéciaux de Sécurité sociale, régimes de retraite complémentaire ou assurance-chômage.
+
+Avec les codes, ça donne ça :
+
+```{r}
+messec = c("S13", 
+           "S13111",
+           "S13112",
+           "S1311",
+           "S1314",
+           "S1313")
+
+dico$ref_sector |> 
+  filter(code %in% messec) |> 
+  mutate(code = factor(code, levels = messec)) |> 
+  arrange(code) |> 
+  knitr::kable() |> 
+  kableExtra::row_spec(1, bold = T, color = "white", background = "#D7261E") |> 
+  kableExtra::row_spec(2:3, italic = TRUE) |> 
+  kableExtra::row_spec(4, bold = TRUE, background = "grey90") |> 
+  kableExtra::row_spec(5:6, bold = TRUE) |> 
+  kableExtra::kable_styling()
+```
+
+Bien, maintenant que nous avons posé quelques bases, on continue vers encore plus de définitions et de textes de loi... youpi !
+
+## La loi
+
+La partie la plus aride, mais indispensable pour bien comprendre.
+
+La France s'inscrit dans un contexte règlementaire contraint.
+
+Pour faire simple, les principaux textes sur lesquels s'appuie la comptabilité de l'État sont 
+
++ la [loi organique relative aux lois de finance (LOLF)](https://www.budget.gouv.fr/reperes/lolf/articles/loi-organique-relative-aux-lois), promulgée en 2001, et mise en oeuvre pour le projet de loi de finances 2006. [lolf JO](https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000216983)
+
++ le [système européen des comptes (SEC)](https://ec.europa.eu/eurostat/fr/web/esa-2010)
+
+## Et les chiffres alors ?
+
+C'est combien le montant de la dette publique ? on est en déficit ? on risque des sanctions européenne ? l'intervention du FMI ? `r emoji::emoji("melting-face")`
+
+Sans verser dans le catastrophisme, la situation *financière* de l'État n'est pas, actuellement, enchanteresse (euphémisme *inside*)...
+
+Mais alors, où-en-est-on ? on est vraiment en galère ? on risque réellement des sanctions ?
+
+Pour la faire courte ... oui et non `r emoji::emoji("sweat-smile")`
+
+Dans l'[article 126 du traité de fonctionnement de l'UE](https://eur-lex.europa.eu/legal-content/FR/ALL/?uri=CELEX%3A12008E126), l'article 1 mentionne :
+
+> 1. Les États membres évitent les déficits publics excessifs.
+
+C'est l'**article 1**, ça sent le truc important quand même ... 
+
+Analysons cela de plus près : Le [cadre de gouvernance économique de l'UE](https://www.consilium.europa.eu/fr/policies/economic-governance-framework/) a pour objectif de coordonner les politiques économiques des États membres.
+
+> Il repose sur les principes de surveillance, de prévention et de correction des tendances économiques susceptibles d'affaiblir les économies individuelles des États membres.
+
+## Rappels historiques
+
+Avant même l'introduction de l'€, l'UE avait mis en place une architecture d'une union économique et monétaire grâce au [traité de Maastricht](https://eur-lex.europa.eu/legal-content/FR/TXT/?uri=CELEX%3A11992M%2FTXT) en 1992. Les fameux **3% de ratio de déficit**, et de **60% d'endettement**. Ces indicateurs sont calculés à partir du [PIB](https://www.insee.fr/fr/metadonnees/definition/c1365). Il s'agissait alors de fixer des *valeurs de référence*, pour prévenir l'apparition de **déficits excessifs**, et s'ils advenaient, d'en accélérer la correction.
+
+Tout ce pavé pour dire qu'il existe bel et bien, en droit européen, une [procédure concernant les déficits excessifs (PDE)](https://www.consilium.europa.eu/fr/policies/excessive-deficit-procedure/), qui pourrait aboutir à une **amende de 0.05% du PIB antérieur**.
+
+## Le PIB ...
+
+```{r}
+pib24 = 
+  tee |> 
+  filter(STO == "B1GQ",
+         TIME_PERIOD == "2024",
+         DECIMALS == "1",
+         COUNTERPART_AREA == "W0",
+         ) |> 
+  select(OBS_VALUE) |> 
+  pull()
+
+pib24f = format(pib24 * 1000000, scientific = FALSE, big.mark = " ")
+```
+
+En 2024, le PIB s'élève à `r pib24f` €
+
+**2 919 MILLIARD D'EUROS**
+
+```{r}
+pibevo =
+  tee |> 
+  filter(STO == "B1GQ",
+         DECIMALS == "1",
+         REF_SECTOR == "S1",
+#          CONSOLIDATION == "C",
+         COUNTERPART_AREA == "W0",
+#          MATURITY == "T",
+#          INSTR_ASSET == "T",
+         OBS_STATUS_FR == "D",
+         OBS_STATUS == "A",
+         PRICES == "V",
+#          UNIT_MULT == "6",
+#          UNIT_MEASURE == "XDC"
+#          ACCOUNTING_ENTRY == "B"
+         ) |> 
+  group_by(TIME_PERIOD) |> 
+#   summarise(n = n(), .groups = "drop")
+  summarise(n = sum(OBS_VALUE), .groups = "drop")
+
+gpibevo =
+  pibevo |> 
+  ggplot(aes(x = TIME_PERIOD, y = n)) +
+  geom_point() +
+  geom_line(col = "blue") +
+  scale_y_continuous(labels = function(x) format(x, scientific = FALSE, big.mark = " ")) +
+  theme_minimal() +
+  labs(x = "", y = "",
+  caption = 
+    paste0(
+      "Source : Insee, tableau économique d'ensemble",
+      "\n",
+      "https://catalogue-donnees.insee.fr/fr/catalogue/recherche/DD_CNA_TEE"),
+  title = "PIB, en millions de devise nationale") +
+  theme(plot.caption = element_text(hjust = 0))
+
+plotly::ggplotly(gpibevo)
+
+
+# pibevo |> 
+#   ggplot(aes(x = TIME_PERIOD, y = n)) +
+#   geom_smooth(se = FALSE) +
+#   scale_y_continuous(labels = function(x) format(x, scientific = FALSE, big.mark = " ")) +
+#   theme_minimal() +
+#   labs(x = "", y = "",
+#   caption = 
+#     paste0(
+#       "Source : Insee, tableau économique d'ensemble",
+#       "\n",
+#       "https://catalogue-donnees.insee.fr/fr/catalogue/recherche/DD_CNA_TEE"),
+#   title = "PIB, en millions de devise nationale") +
+#   theme(plot.caption = element_text(hjust = 0))
+
+```
+
+## Et la dette dans tout ça ?
+
+Le PIB c'est bien joli, mais la dette, elle s'élève à combien ?
+
+```{r}
+
+evodette =
+  apu |> 
+  filter(
+         REF_SECTOR %in% c("S13"),
+         STO == "_GD_PPIB",
+         COUNTERPART_AREA == "W0",
+         INSTR_ASSET == "GD") |> 
+  arrange(TIME_PERIOD)
+         
+
+evodette |> 
+  ggplot(aes(x = TIME_PERIOD, y = OBS_VALUE)) +
+  geom_line(col = "blue") +
+  geom_hline(yintercept = 60, col = "red") +
+  theme_minimal() +
+  labs(x = "", y = "",
+  caption = 
+    paste0(
+      "Source : Insee, comptes des administrations publiques",
+      "\n",
+      "https://catalogue-donnees.insee.fr/fr/catalogue/recherche/DD_CNA_APU",
+      "\n",
+      "Notes : données 2023 SD, 2024 PROV",
+      "\n",
+      "Lecture : en 2022, la dette de la France au sens de Maastricht s'élevait à 111.37 % du PIB"),
+  title = "Évolution de la dette au sens de Maastricht",
+  subtitle = "Clôture du bilan/positions/flux, en pourcentage du PIB") +
+  theme(plot.caption = element_text(hjust = 0))
+
+
+```
+
+OK, depuis les années 2000, c'est pas fameux...
+
+
+## Dépenses et recettes des administrations
+
+```{r}
+
+dfdr = 
+  tee |> 
+  filter(
+         REF_SECTOR %in% c("S1311", "S1314", "S1313"),
+#          TIME_PERIOD %in% c("2022", "2023", "2024"),
+         TIME_PERIOD %in% c("2024"),
+         STO %in% c("OTE", "OTR"),
+#          OBS_STATUS == "A",
+         COUNTERPART_AREA == "W0",
+#          INSTR_ASSET == "GD"
+         ) |> 
+  arrange(TIME_PERIOD)
+
+d1 = dfdr |> 
+  group_by(STO, REF_SECTOR) |> 
+  summarise(val = sum(OBS_VALUE), .groups = "drop") |> 
+  mutate(STO = ifelse(STO == "OTE", "Dépenses", "Recettes"))
+
+d1 |> 
+  ggplot(aes(x = REF_SECTOR, y = val, fill = STO)) +
+  geom_col(pos = "dodge") +
+  theme_minimal() +
+  scale_y_continuous(
+         expand = expansion(mult = c(0, 0.05)),
+         labels = function(x) format(x, scientific = FALSE, big.mark = " ")) +
+  labs(x = "", y = "", fill = "Nature",
+       title = "Dépenses et recettes des APU en 2024",
+       subtitle = "En millions de devise nationale",
+       caption = paste0(
+        "Source : Insee, ....",
+       "\n",
+       "Notes : ...")
+       ) +
+  theme(plot.caption = element_text(hjust = 0))
+
+```
+
+## Solde des flux nets d'actifs et de passifs fi des APU
+
+```{r}
+
+tee |> 
+  filter(
+         REF_SECTOR %in% c("S13"),
+         STO %in% c("B9F"),
+         COUNTERPART_AREA == "W0",
+         ) |> 
+  arrange(TIME_PERIOD) |> 
+  ggplot(aes(x = TIME_PERIOD, y = OBS_VALUE)) +
+  geom_line() +
+  theme_minimal() +
+  labs(x = "", y = "",
+       title = "Évolution du solde des flux nets d'actifs et de passifs financiers des APU",
+       subtitle = "En millions de devise nationale",
+       caption = "Source : Insee, ....") +
+  theme(plot.caption = element_text(hjust = 0))
+
+```
+
+## Liens
+
+[Comptes nationaux 2024](https://www.insee.fr/fr/statistiques/8574653?sommaire=8574832)
+
+[Comptes nationaux 2023]("https://www.insee.fr/fr/statistiques/8068624?sommaire=8068749")
+
+[Rapport CC juin 2025](https://ccomptes.fr/fr/publications/la-situation-et-les-perspectives-des-finances-publiques-16)
+
+## Pour aller plus loin
+
+[Pacte de stabilité](https://www.touteleurope.eu/fonctionnement-de-l-ue/qu-est-ce-que-le-pacte-de-stabilite-et-de-croissance/)
+
+[TSCG : traité sur la stabilité, la coordination et la gouvernance](https://www.touteleurope.eu/economie-et-social/qu-est-ce-que-le-pacte-budgetaire-europeen/)
